@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: postgres18
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: midb
+    volumes:
+      - pgdata2:/var/lib/postgresql
+      - ./sql-init:/docker-entrypoint-initdb.d
+    ports:
+      - "5435:5432"
+    networks:
+      - red-servidores
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin2
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    volumes:
+      - pgadmin-data2:/var/lib/pgadmin
+    ports:
+      - "5051:80"
+    depends_on:
+      - postgres
+    networks:
+      - red-servidores
+  apache:
+    build: ./apache
+    container_name: server-apache2-2
+    restart: always
+    volumes:
+      - ./proyectos:/var/www/html
+    ports:
+      - "8089:80"
+    networks:
+      - red-servidores
+
+networks:
+  red-servidores:
+volumes:
+  pgdata2:
+  pgadmin-data2:
